@@ -1,23 +1,16 @@
 use crate::token::Token;
 
-#[derive(Debug, Clone)]
-pub struct Space {
-    consumed: usize,
-}
+pub fn parse_space(slice: &str) -> Token {
+    let chars = slice.chars();
+    let mut consumed = 0;
 
-impl Token for Space {
-    fn parse(slice: &str) -> Self {
-        let chars = slice.chars();
-        let mut consumed = 0;
-
-        for char in chars {
-            if char == ' ' || char == '\t' {
-                consumed = consumed + 1;
-            } else {
-                break;
-            }
+    for char in chars {
+        if char == ' ' || char == '\t' {
+            consumed = consumed + 1;
+        } else {
+            break;
         }
-
-        Self { consumed }
     }
+
+    Token::Space { consumed }
 }
