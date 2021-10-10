@@ -1,4 +1,4 @@
-use crate::token::Token;
+use crate::token::{Error, Token};
 
 pub fn parse_number(slice: &str) -> Token {
     let mut parsed = 0;
@@ -22,5 +22,16 @@ pub fn parse_number(slice: &str) -> Token {
             value: None,
             consumed: 0,
         },
+    }
+}
+
+pub fn generate_code_number(token: &Token) -> Result<String, Error> {
+    if let Token::Number { value, .. } = token {
+        match value {
+            Some(number) => Ok(format!("{}", *number)),
+            None => Err(token.code_gen_token_missing_value()),
+        }
+    } else {
+        Err(token.code_gen_invalid_token())
     }
 }

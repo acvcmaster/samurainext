@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::token::Token;
+use crate::token::{Error, Token};
 
 #[derive(Debug, Clone)]
 pub enum OperatorType {
@@ -40,5 +40,21 @@ pub fn parse_operator(slice: &str) -> Token {
             None => empty,
         },
         Err(_) => empty,
+    }
+}
+
+pub fn generate_code_operator(token: &Token) -> Result<String, Error> {
+    if let Token::Operator { value, .. } = token {
+        match value {
+            Some(operator_type) => match operator_type {
+                OperatorType::Add => Ok(format!("+")),
+                OperatorType::Sub => Ok(format!("-")),
+                OperatorType::Mul => Ok(format!("*")),
+                OperatorType::Div => Ok(format!("/")),
+            },
+            None => Err(token.code_gen_token_missing_value()),
+        }
+    } else {
+        Err(token.code_gen_invalid_token())
     }
 }

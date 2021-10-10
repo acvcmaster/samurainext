@@ -1,8 +1,8 @@
 use regex::Regex;
 
-use crate::token::Token;
+use crate::token::{Error, Token};
 
-pub fn parse_bool(slice: &str) -> Token {
+pub fn parse_boolean(slice: &str) -> Token {
     let empty = Token::Boolean {
         value: None,
         consumed: 0,
@@ -30,5 +30,19 @@ pub fn parse_bool(slice: &str) -> Token {
             None => empty,
         },
         Err(_) => empty,
+    }
+}
+
+pub fn generate_code_boolean(token: &Token) -> Result<String, Error> {
+    if let Token::Boolean { value, .. } = token {
+        match value {
+            Some(boolean) => match boolean {
+                true => Ok(format!("1")),
+                false => Ok(format!("0")),
+            },
+            None => Err(token.code_gen_token_missing_value()),
+        }
+    } else {
+        Err(token.code_gen_invalid_token())
     }
 }

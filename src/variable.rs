@@ -1,6 +1,8 @@
+use std::fmt::format;
+
 use regex::Regex;
 
-use crate::token::Token;
+use crate::token::{Error, Token};
 
 pub fn parse_variable(slice: &str) -> Token {
     let empty = Token::Variable {
@@ -26,5 +28,16 @@ pub fn parse_variable(slice: &str) -> Token {
             None => empty,
         },
         Err(_) => empty,
+    }
+}
+
+pub fn generate_code_variable(token: &Token) -> Result<String, Error> {
+    if let Token::Variable { value, .. } = token {
+        match value {
+            Some(name) => Ok(format!("{}", *name)),
+            None => Err(token.code_gen_token_missing_value()),
+        }
+    } else {
+        Err(token.code_gen_invalid_token())
     }
 }
