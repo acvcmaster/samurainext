@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use regex::Regex;
 
 use crate::token::{Error, Token};
@@ -10,7 +8,7 @@ pub fn parse_variable(slice: &str) -> Token {
         consumed: 0,
     };
 
-    match Regex::new(r"([^\d ][^ ]*)") {
+    match Regex::new(r"([a-zA-Z]{1}[a-zA-Z0-9]*)") {
         Ok(regex) => match regex.captures(slice) {
             Some(captures) => match captures.get(0) {
                 Some(capture) => {

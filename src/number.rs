@@ -8,6 +8,8 @@ pub fn parse_number(slice: &str) -> Token {
         if char.is_numeric() {
             parsed = parsed + 1;
             result_array.push(char);
+        } else {
+            break;
         }
     }
 

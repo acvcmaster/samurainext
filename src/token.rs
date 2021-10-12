@@ -1,7 +1,9 @@
 use crate::{
     assignment::generate_code_assignment, boolean::generate_code_boolean,
-    declaration::generate_code_declaration, number::generate_code_number,
-    operator::generate_code_operator, operator::OperatorType, variable::generate_code_variable,
+    declaration::generate_code_declaration, expression::generate_code_expression,
+    factor::generate_code_factor, group::generate_code_group, number::generate_code_number,
+    operator::generate_code_operator, operator::OperatorType, term::generate_code_term,
+    variable::generate_code_variable,
 };
 
 #[derive(Debug, Clone)]
@@ -26,6 +28,7 @@ pub enum Token {
     },
     Operator {
         value: Option<OperatorType>,
+        preceding: Option<bool>,
         consumed: usize,
     },
     Assignment {
@@ -35,6 +38,26 @@ pub enum Token {
     },
     Declaration {
         assignment: Option<Box<Token>>,
+        consumed: usize,
+    },
+    Factor {
+        value: Option<Box<Token>>,
+        consumed: usize,
+    },
+    Term {
+        left: Option<Box<Token>>,
+        right: Option<Box<Token>>,
+        operator: Option<Box<Token>>,
+        consumed: usize,
+    },
+    Expression {
+        left: Option<Box<Token>>,
+        right: Option<Box<Token>>,
+        operator: Option<Box<Token>>,
+        consumed: usize,
+    },
+    Group {
+        value: Option<Box<Token>>,
         consumed: usize,
     },
 }
@@ -55,6 +78,10 @@ impl Token {
             Token::Operator { consumed, .. } => *consumed,
             Token::Assignment { consumed, .. } => *consumed,
             Token::Declaration { consumed, .. } => *consumed,
+            Token::Factor { consumed, .. } => *consumed,
+            Token::Term { consumed, .. } => *consumed,
+            Token::Expression { consumed, .. } => *consumed,
+            Token::Group { consumed, .. } => *consumed,
         }
     }
 
@@ -70,6 +97,10 @@ impl Token {
             Token::Operator { .. } => generate_code_operator(&self),
             Token::Assignment { .. } => generate_code_assignment(&self),
             Token::Declaration { .. } => generate_code_declaration(&self),
+            Token::Factor { .. } => generate_code_factor(&self),
+            Token::Term { .. } => generate_code_term(&self),
+            Token::Expression { .. } => generate_code_expression(&self),
+            Token::Group { .. } => generate_code_group(&self),
         }
     }
 

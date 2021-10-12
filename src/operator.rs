@@ -4,33 +4,47 @@ use crate::token::{Error, Token};
 
 #[derive(Debug, Clone)]
 pub enum OperatorType {
-    Add, // 足す
-    Sub, // 引く
-    Mul, // 掛ける
-    Div, // 割る
+    Add, // +
+    Sub, // -
+    Mul, // *
+    Div, // /
 }
 
 pub fn parse_operator(slice: &str) -> Token {
     let empty = Token::Operator {
         value: None,
+        preceding: None,
         consumed: 0,
     };
 
-    match Regex::new(r"(足す|引く|掛ける|割る)") {
+    match Regex::new(r"(\+|-|\*|/)") {
         Ok(regex) => match regex.captures(slice) {
             Some(captures) => match captures.get(0) {
                 Some(capture) => {
                     let result = capture.as_str();
                     match slice.starts_with(result) {
-                        true => Token::Operator {
-                            value: match result {
-                                "足す" => Some(OperatorType::Add),
-                                "引く" => Some(OperatorType::Sub),
-                                "掛ける" => Some(OperatorType::Mul),
-                                "割る" => Some(OperatorType::Div),
-                                _ => None,
+                        true => match result {
+                            "+" => Token::Operator {
+                                value: Some(OperatorType::Add),
+                                preceding: Some(false),
+                                consumed: result.len(),
                             },
-                            consumed: result.len(),
+                            "-" => Token::Operator {
+                                value: Some(OperatorType::Sub),
+                                preceding: Some(false),
+                                consumed: result.len(),
+                            },
+                            "*" => Token::Operator {
+                                value: Some(OperatorType::Mul),
+                                preceding: Some(true),
+                                consumed: result.len(),
+                            },
+                            "/" => Token::Operator {
+                                value: Some(OperatorType::Div),
+                                preceding: Some(true),
+                                consumed: result.len(),
+                            },
+                            _ => empty,
                         },
                         false => empty,
                     }
@@ -39,7 +53,10 @@ pub fn parse_operator(slice: &str) -> Token {
             },
             None => empty,
         },
-        Err(_) => empty,
+        Err(t) => {
+            println!("{:?}", t);
+            empty
+        }
     }
 }
 
